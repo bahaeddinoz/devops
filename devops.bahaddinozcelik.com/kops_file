@@ -1,0 +1,14 @@
+kops create cluster \
+--state="s3://kops-state.${DOMAIN}" \
+--vpc=$(terraform output vpc_id) \
+--master-zones=$(terraform output -json networks | jq -r '.["n0"].availability_zone') \
+--zones=$(terraform output -json networks | jq -r '.[].availability_zone' | paste -sd, -) \
+--subnets=$(terraform output -json subnet_ids | jq -r 'join(",")') \
+--networking=calico \
+--node-count=2 \
+--master-count=1 \
+--master-size=t2.medium \
+--node-size=t2.medium \
+--dns-zone=${DOMAIN} \
+--dns=public \
+--name=${PROJECT_NAME}.${DOMAIN}
